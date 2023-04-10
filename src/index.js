@@ -22,7 +22,7 @@ root.render(
   // <React.StrictMode>
   <AuthProvider>
     <Provider store={store}>
-      <BrowserRouter basename="crm-carrying">
+      <BrowserRouter basename="/crm-carrying/">
         <App />
       </BrowserRouter>
     </Provider>

@@ -23,7 +23,9 @@ const MainPage = () => {
       </th>
 
       {tBodyArr.map((item) => (
-        <td className="tAc">{doc.data()[item]}</td>
+        <td key={item} className="tAc">
+          {doc.data()[item]}
+        </td>
       ))}
 
       {/* <td>{doc.data().carNumber}</td>
@@ -35,7 +37,7 @@ const MainPage = () => {
           <i className="bi bi-pencil"></i>
         </button>
         <button className="btn-danger rounded-sm border-0">
-          <i class="bi bi-trash"></i>
+          <i className="bi bi-trash"></i>
         </button>
       </td>
     </tr>
@@ -49,7 +51,9 @@ const MainPage = () => {
         <thead className="thead-dark ">
           <tr>
             {tHeadArr.map((item) => (
-              <th className="tAc">{item}</th>
+              <th key={item} className="tAc">
+                {item}
+              </th>
             ))}
           </tr>
         </thead>
