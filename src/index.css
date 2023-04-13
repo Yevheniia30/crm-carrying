@@ -43,3 +43,7 @@ p {
 .w200 {
   width: 100%;
 }
+.user-avatar {
+  width: 40px;
+  border-radius: 50%;
+}

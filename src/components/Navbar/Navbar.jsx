@@ -15,7 +15,7 @@ const Navbar = () => {
       >
         <div className="d-flex align-items-center">
           <button
-            className="navbar-toggler"
+            className="navbar-toggler mr-2"
             type="button"
             data-toggle="collapse"
             data-target="#navbarToggleExternalContent"
@@ -25,7 +25,11 @@ const Navbar = () => {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-          {/* <img src={user.photoURL} alt={`${user?.displayName}`} /> */}
+          <img
+            src={user.photoURL}
+            alt={`${user?.displayName}`}
+            className="user-avatar"
+          />
           <div>
             <span className="ml-2 mr-2 text-light">{user.displayName}</span>
             <small className="btn-success">admin</small>
