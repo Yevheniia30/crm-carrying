@@ -1,5 +1,5 @@
-import { createContext } from "react";
-// import { auth } from "firebaseConfig";
+import { createContext, useMemo } from "react";
+import { db } from "firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
   createUserWithEmailAndPassword,
@@ -16,10 +16,17 @@ import {
   // recaptchaVerifier,
 } from "firebaseConfig";
 
+import { doc, setDoc } from "firebase/firestore";
+
 export const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
   const [user, loading, error] = useAuthState(auth);
+  console.log("process.env", process.env);
+  const isAdmin = useMemo(() => {
+    return Boolean(user?.email === process.env.REACT_APP_ADMIN_EMAIL);
+  }, [user?.email]);
+
   const handleSubmitWithPhone = (phone) => {
     console.log("phone", phone);
     const recaptchaVerifier = new RecaptchaVerifier(
@@ -34,7 +41,20 @@ const AuthProvider = ({ children }) => {
   const handleSubmitWithFacebook = async () => {
     console.log("facebook");
     try {
-      await signInWithPopup(auth, facebookAuthprovider);
+      const response = await signInWithPopup(auth, facebookAuthprovider);
+      const user = response.user;
+      // await updateProfile(user, {
+      //   displayName: `${name} ${surname}`,
+      // });
+      const { displayName, uid, email: userEmail } = user;
+      // Add a new document in collection "users"
+      await setDoc(doc(db, "users", uid), {
+        uid,
+        displayName,
+        email: userEmail,
+        role: "facebook user",
+        country: "USA",
+      });
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
@@ -45,7 +65,20 @@ const AuthProvider = ({ children }) => {
   const handleSubmitWithGoogle = async () => {
     console.log("google");
     try {
-      await signInWithPopup(auth, googleAuthProvider);
+      const response = await signInWithPopup(auth, googleAuthProvider);
+      const user = response.user;
+      // await updateProfile(user, {
+      //   displayName: `${name} ${surname}`,
+      // });
+      const { displayName, uid, email: userEmail } = user;
+      // Add a new document in collection "users"
+      await setDoc(doc(db, "users", uid), {
+        uid,
+        displayName,
+        email: userEmail,
+        role: "user",
+        country: "USA",
+      });
     } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
@@ -62,6 +95,15 @@ const AuthProvider = ({ children }) => {
       const user = response.user;
       await updateProfile(user, {
         displayName: `${name} ${surname}`,
+      });
+      const { displayName, uid, email: userEmail } = user;
+      // Add a new document in collection "users"
+      await setDoc(doc(db, "users", uid), {
+        uid,
+        displayName,
+        email: userEmail,
+        role: "user",
+        country: "Ukraine",
       });
     } catch (error) {
       const errorCode = error.code;
@@ -89,6 +131,7 @@ const AuthProvider = ({ children }) => {
         handleSubmitWithGoogle,
         handleSubmitWithFacebook,
         handleSubmitWithPhone,
+        isAdmin,
       }}
     >
       {children}

@@ -19,6 +19,7 @@ export const links = [
   {
     text: "Editing Users",
     to: USERS_ROUTE,
+    role: true,
   },
   {
     text: "Log in",

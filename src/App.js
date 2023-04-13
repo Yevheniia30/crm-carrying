@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useContext } from "react";
 import {
@@ -19,8 +19,8 @@ import Layout from "components/Layout/Layout";
 import Loader from "components/Loader/Loader";
 
 const App = () => {
-  const { user, loading } = useAuth();
-  console.log("user", user);
+  const { user, loading, isAdmin } = useAuth();
+  // console.log("user", user);
   return (
     <div className={user ? "container-fluid d-flex p-0" : "container-fluid"}>
       {user && !loading && <Navbar />}
@@ -31,13 +31,17 @@ const App = () => {
           <Route path={MAIN_ROUTE} element={<Layout />}>
             <Route element={<PrivateRoute redirectTo={LOGIN_ROUTE} />}>
               <Route index element={<MainPage />} />
-              <Route path={USERS_ROUTE} element={<UsersPage />} />
+              {isAdmin && <Route path={USERS_ROUTE} element={<UsersPage />} />}
             </Route>
             <Route element={<PublicRoute redirectTo={MAIN_ROUTE} />}>
               <Route path={SIGNUP_ROUTE} element={<SignupPage />} />
               <Route path={LOGIN_ROUTE} element={<LoginPage />} />
             </Route>
           </Route>
+          <Route
+            path="*"
+            element={<Navigate to={user ? MAIN_ROUTE : LOGIN_ROUTE} />}
+          />
         </Routes>
       )}
     </div>
