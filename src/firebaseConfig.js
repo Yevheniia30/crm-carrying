@@ -1,7 +1,15 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getFunctions } from "firebase/functions";
+// import { initializeApp } from "firebase-admin/app";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  RecaptchaVerifier,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+// const { initializeApp } = require("firebase-admin/app");
 // import { getAnalytics } from "firebase/analytics";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -21,7 +29,12 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-console.log(auth);
+// console.log(auth);
 export const db = getFirestore(app);
-console.log("db", db);
+export const googleAuthProvider = new GoogleAuthProvider();
+export const facebookAuthprovider = new FacebookAuthProvider();
+// export const recaptchaVerifier = new RecaptchaVerifier();
+
+// console.log("db", db);
 // const analytics = getAnalytics(app);
+console.log("functions", getFunctions());

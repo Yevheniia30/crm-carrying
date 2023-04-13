@@ -5,6 +5,7 @@ import { useAuth } from "hooks/useAuth";
 
 const Navbar = () => {
   const { user } = useAuth();
+  console.log("navbar user", user);
 
   return (
     <aside className="top">

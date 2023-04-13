@@ -15,6 +15,8 @@ const tBodyArr = ["carNumber", "departure", "destination", "passengersCount"];
 
 const MainPage = () => {
   const [trips, loading, error] = useCollection(query(collection(db, "trips")));
+  // const [users] = useCollection(query(collection(db, "users")));
+  // console.log("users", users.docs);
 
   const elements = trips?.docs.map((doc, idx) => (
     <tr key={doc.id}>
@@ -28,10 +30,6 @@ const MainPage = () => {
         </td>
       ))}
 
-      {/* <td>{doc.data().carNumber}</td>
-      <td>{doc.data().departure}</td>
-      <td>{doc.data().destination}</td>
-      <td>{doc.data().passengersCount}</td> */}
       <td className="dFjSa">
         <button className="btn-warning rounded-sm border-0">
           <i className="bi bi-pencil"></i>

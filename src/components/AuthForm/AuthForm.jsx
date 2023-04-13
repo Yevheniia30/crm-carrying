@@ -1,7 +1,8 @@
 import { Formik, Field, ErrorMessage } from "formik";
+import { useState } from "react";
 import * as Yup from "yup";
 import { useAuth } from "hooks/useAuth";
-
+import Modal from "components/Modal/Modal";
 const userSchema = Yup.object().shape({
   // date: Yup.date().required('Data is a required field'),
   name: Yup.string()
@@ -42,11 +43,22 @@ const initialLogin = {
   password: "",
 };
 
-const AuthForm = ({ isSignup, onSubmit }) => {
-  const { error } = useAuth();
-  console.log("error", error);
+const AuthForm = ({
+  isSignup,
+  onSubmitWithEmail,
+  onSubmitWithGoogle,
+  onSubmitWithFacebook,
+  onSubmitWithPhone,
+}) => {
+  // const { error } = useAuth();
+  // console.log("error", error);
   const initialValues = isSignup ? initialSignup : initialLogin;
-  console.log("initialValues", initialValues);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [code, setCode] = useState("");
+  const [res, setRes] = useState(null);
+  // console.log("initialValues", initialValues);
   const FormError = ({ name }) => {
     return (
       <ErrorMessage
@@ -56,14 +68,42 @@ const AuthForm = ({ isSignup, onSubmit }) => {
     );
   };
 
+  const handleCancel = () => {
+    setPhone("");
+    setIsModalOpen(false);
+  };
+
+  const handleGetOtp = async (e) => {
+    e.preventDefault();
+    console.log("phone", phone);
+    setRes(null);
+    try {
+      const response = await onSubmitWithPhone(phone);
+      console.log("response", response);
+      setRes(response);
+    } catch (error) {
+      console.log("error", error.message);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    console.log("code", code);
+    try {
+      await res.confirm(code);
+    } catch (error) {
+      console.log("error", error.message);
+    }
+  };
+
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={isSignup ? userSchema : userSchemaLogin}
-      onSubmit={(values, { setSubmitting }) => {
-        console.log("values", values);
-        onSubmit(values);
-      }}
+      // onSubmit={(values, { setSubmitting }) => {
+      //   console.log("values", values);
+      //   onSubmit(values);
+      // }}
     >
       {({ values, handleSubmit, handleChange }) => (
         <div className="formContainer">
@@ -126,15 +166,80 @@ const AuthForm = ({ isSignup, onSubmit }) => {
 
             <button
               type="submit"
-              onClick={() => console.log("click")}
-              className="btn btn-primary"
+              onClick={() => onSubmitWithEmail(values)}
+              className="btn btn-primary w200 mb-2"
             >
               {isSignup ? "Sign up" : "Log in"}
             </button>
-            <button>Sign in with Google</button>
-            <button>Sign in with Facebook</button>
-            <button>Sign in with phone</button>
+            <button
+              type="submit"
+              className="btn btn-outline-dark w200 mb-2"
+              onClick={() => onSubmitWithGoogle()}
+            >
+              <img
+                width="20px"
+                className="mr-2"
+                alt="Google sign-in"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png"
+              />
+              Sign in with Google
+            </button>
+            <button
+              type="submit"
+              className="btn btn-outline-dark w200 mb-2"
+              onClick={() => onSubmitWithFacebook()}
+            >
+              <i
+                className="fa fa-facebook-f fa-lg mr-2"
+                style={{ color: "#3b5998" }}
+              ></i>
+              Sign in with Facebook
+            </button>
+            <button
+              type="submit"
+              className="btn btn-outline-dark w200 mb-2"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <i
+                className="bi bi-phone-fill fa-lg mr-2"
+                style={{ color: "#545457" }}
+              ></i>
+              Sign in with phone
+            </button>
           </form>
+          {isModalOpen && (
+            <Modal>
+              {!res ? (
+                <form onSubmit={handleGetOtp}>
+                  <input
+                    type="tel"
+                    placeholder="+380"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                  />
+                  <div id="recaptcha-container" />
+                  <button>Confirm</button>
+                  <button type="button" onClick={handleCancel}>
+                    Cancel
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleVerifyOtp}>
+                  <input
+                    type="text"
+                    placeholder="Enter code"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                  />
+                  {/* <div id="recaptcha-container" /> */}
+                  <button>Send code</button>
+                  <button type="button" onClick={handleCancel}>
+                    Cancel
+                  </button>
+                </form>
+              )}
+            </Modal>
+          )}
         </div>
       )}
     </Formik>
