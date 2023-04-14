@@ -26,6 +26,7 @@ const MainPage = () => {
 
       {tBodyArr.map((item) => (
         <td key={item} className="tAc">
+          {console.log(item)}
           {doc.data()[item]}
         </td>
       ))}

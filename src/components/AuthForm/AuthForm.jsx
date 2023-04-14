@@ -1,63 +1,21 @@
 import { Formik, Field, ErrorMessage } from "formik";
-import { useState } from "react";
-import * as Yup from "yup";
+import { useMemo } from "react";
+// import * as Yup from "yup";
+import { userSchema, userSchemaLogin } from "utils/validations";
+import { initialLogin, initialSignup } from "utils/initials";
 import { useAuth } from "hooks/useAuth";
 import Modal from "components/Modal/Modal";
-const userSchema = Yup.object().shape({
-  // date: Yup.date().required('Data is a required field'),
-  name: Yup.string()
-    .min(2, "Too Short!")
-    .max(20, "Too Long!")
-    .required("Required")
-    .matches(/^[A-Za-z ]*$/, "Please enter valid name"),
-  surname: Yup.string()
-    .min(2, "Too Short!")
-    .max(20, "Too Long!")
-    .required("Required")
-    .matches(/^[A-Za-z ]*$/, "Please enter valid surname"),
-  email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    // .max(20, 'Too Long!')
-    .required("Required"),
-});
+import PhoneAuthForm from "components/PhoneAuthForm/PhoneAuthForm";
 
-const userSchemaLogin = Yup.object().shape({
-  // date: Yup.date().required('Data is a required field'),
-  email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
-    // .max(20, 'Too Long!')
-    .required("Required"),
-});
-
-const initialSignup = {
-  name: "",
-  surname: "",
-  email: "",
-  password: "",
-};
-
-const initialLogin = {
-  email: "",
-  password: "",
-};
-
-const AuthForm = ({
-  isSignup,
-  onSubmitWithEmail,
-  onSubmitWithGoogle,
-  onSubmitWithFacebook,
-  onSubmitWithPhone,
-}) => {
-  // const { error } = useAuth();
+const AuthForm = ({ isSignup, onSubmitWithEmail }) => {
+  const { handleSubmitWithGoogle, handleSubmitWithFacebook, res } = useAuth();
   // console.log("error", error);
   const initialValues = isSignup ? initialSignup : initialLogin;
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [code, setCode] = useState("");
-  const [res, setRes] = useState(null);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [phone, setPhone] = useState("");
+  // const [code, setCode] = useState("");
+  // const [res, setRes] = useState(null);
   // console.log("initialValues", initialValues);
   const FormError = ({ name }) => {
     return (
@@ -66,34 +24,6 @@ const AuthForm = ({
         render={(msg) => <p className="text-danger">{msg}</p>}
       />
     );
-  };
-
-  const handleCancel = () => {
-    setPhone("");
-    setIsModalOpen(false);
-  };
-
-  const handleGetOtp = async (e) => {
-    e.preventDefault();
-    console.log("phone", phone);
-    setRes(null);
-    try {
-      const response = await onSubmitWithPhone(phone);
-      console.log("response", response);
-      setRes(response);
-    } catch (error) {
-      console.log("error", error.message);
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    console.log("code", code);
-    try {
-      await res.confirm(code);
-    } catch (error) {
-      console.log("error", error.message);
-    }
   };
 
   return (
@@ -174,7 +104,7 @@ const AuthForm = ({
             <button
               type="submit"
               className="btn btn-outline-dark w200 mb-2"
-              onClick={() => onSubmitWithGoogle()}
+              onClick={() => handleSubmitWithGoogle()}
             >
               <img
                 width="20px"
@@ -187,7 +117,7 @@ const AuthForm = ({
             <button
               type="submit"
               className="btn btn-outline-dark w200 mb-2"
-              onClick={() => onSubmitWithFacebook()}
+              onClick={() => handleSubmitWithFacebook()}
             >
               <i
                 className="fa fa-facebook-f fa-lg mr-2"
@@ -196,9 +126,10 @@ const AuthForm = ({
               Sign in with Facebook
             </button>
             <button
-              type="submit"
+              type="button"
               className="btn btn-outline-dark w200 mb-2"
-              onClick={() => setIsModalOpen(true)}
+              data-toggle="modal"
+              data-target="#exampleModal"
             >
               <i
                 className="bi bi-phone-fill fa-lg mr-2"
@@ -207,39 +138,10 @@ const AuthForm = ({
               Sign in with phone
             </button>
           </form>
-          {isModalOpen && (
-            <Modal>
-              {!res ? (
-                <form onSubmit={handleGetOtp}>
-                  <input
-                    type="tel"
-                    placeholder="+380"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                  <div id="recaptcha-container" />
-                  <button>Confirm</button>
-                  <button type="button" onClick={handleCancel}>
-                    Cancel
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleVerifyOtp}>
-                  <input
-                    type="text"
-                    placeholder="Enter code"
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                  />
-                  {/* <div id="recaptcha-container" /> */}
-                  <button>Send code</button>
-                  <button type="button" onClick={handleCancel}>
-                    Cancel
-                  </button>
-                </form>
-              )}
-            </Modal>
-          )}
+
+          <Modal title={res ? "Enter code from SMS" : "Enter phone number"}>
+            <PhoneAuthForm res={res} />
+          </Modal>
         </div>
       )}
     </Formik>

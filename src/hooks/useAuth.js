@@ -11,7 +11,10 @@ export const useAuth = () => {
     handleSubmitWithGoogle,
     handleSubmitWithFacebook,
     handleSubmitWithPhone,
+    handleSubmitVerify,
     isAdmin,
+    res,
+    setRes,
   } = useContext(AuthContext);
   return {
     user,
@@ -22,6 +25,9 @@ export const useAuth = () => {
     handleSubmitWithGoogle,
     handleSubmitWithFacebook,
     handleSubmitWithPhone,
+    handleSubmitVerify,
     isAdmin,
+    res,
+    setRes,
   };
 };

@@ -1,4 +1,4 @@
-import { createContext, useMemo } from "react";
+import { createContext, useMemo, useState } from "react";
 import { db } from "firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
@@ -22,12 +22,16 @@ export const AuthContext = createContext(null);
 
 const AuthProvider = ({ children }) => {
   const [user, loading, error] = useAuthState(auth);
+  const [res, setRes] = useState(null);
+
+  console.log("=======", user, loading, error);
+
   console.log("process.env", process.env);
   const isAdmin = useMemo(() => {
     return Boolean(user?.email === process.env.REACT_APP_ADMIN_EMAIL);
   }, [user?.email]);
 
-  const handleSubmitWithPhone = (phone) => {
+  const handleSubmitWithPhone = async (phone) => {
     console.log("phone", phone);
     const recaptchaVerifier = new RecaptchaVerifier(
       "recaptcha-container",
@@ -35,7 +39,44 @@ const AuthProvider = ({ children }) => {
       auth
     );
     recaptchaVerifier.render();
-    return signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+    // return signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+    try {
+      const response = await signInWithPhoneNumber(
+        auth,
+        phone,
+        recaptchaVerifier
+      );
+      console.log("response", response);
+      setRes(response);
+    } catch (error) {
+      console.log("error", error.message);
+    }
+  };
+
+  const handleSubmitVerify = async (code) => {
+    console.log("handleSubmitVerify", code);
+    try {
+      const response = await res.confirm(code);
+      console.log("response", response);
+      const user = response.user;
+      // await updateProfile(user, {
+      //   displayName: `${name} ${surname}`,
+      // });
+      const { displayName, uid, email: userEmail, phoneNumber } = user;
+      console.log("user phone", user);
+      // Add a new document in collection "users"
+      await setDoc(doc(db, "users", uid), {
+        uid,
+        displayName,
+        phoneNumber,
+        email: userEmail,
+        role: "facebook user",
+        country: "USA",
+      });
+      setRes(null);
+    } catch (error) {
+      console.log("error", error.message);
+    }
   };
 
   const handleSubmitWithFacebook = async () => {
@@ -103,7 +144,7 @@ const AuthProvider = ({ children }) => {
         displayName,
         email: userEmail,
         role: "user",
-        country: "Ukraine",
+        // country: "Ukraine",
       });
     } catch (error) {
       const errorCode = error.code;
@@ -131,7 +172,10 @@ const AuthProvider = ({ children }) => {
         handleSubmitWithGoogle,
         handleSubmitWithFacebook,
         handleSubmitWithPhone,
+        handleSubmitVerify,
         isAdmin,
+        res,
+        setRes,
       }}
     >
       {children}
