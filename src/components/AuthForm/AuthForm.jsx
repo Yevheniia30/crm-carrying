@@ -32,10 +32,11 @@ const AuthForm = ({ isSignup, onSubmitWithEmail }) => {
       validationSchema={isSignup ? userSchema : userSchemaLogin}
       // onSubmit={(values, { setSubmitting }) => {
       //   console.log("values", values);
-      //   onSubmit(values);
+
+      //   onSubmitWithEmail(values);
       // }}
     >
-      {({ values, handleSubmit, handleChange }) => (
+      {({ values, handleSubmit, handleChange, isValid }) => (
         <div className="formContainer">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -98,6 +99,7 @@ const AuthForm = ({ isSignup, onSubmitWithEmail }) => {
               type="submit"
               onClick={() => onSubmitWithEmail(values)}
               className="btn btn-primary w200 mb-2"
+              disabled={!isValid}
             >
               {isSignup ? "Sign up" : "Log in"}
             </button>

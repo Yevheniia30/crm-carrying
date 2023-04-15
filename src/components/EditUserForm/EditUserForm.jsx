@@ -42,6 +42,7 @@ const EditUserForm = ({ user, setCurrentUser }) => {
   // const { displayName, uid, role, email, phoneNumber } = state;
   const roles = ["User", "Driver", "Operator", "Admin"];
   const options = roles.map((item) => <option key={item}>{item}</option>);
+  // console.log("options users", options);
   return (
     <form>
       <div className="form-group">

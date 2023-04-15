@@ -9,3 +9,11 @@ export const initialLogin = {
   email: "",
   password: "",
 };
+
+export const initialTrip = {
+  carNumber: "",
+  departure: "",
+  destination: "",
+  passengersCount: "",
+  driver: "",
+};

@@ -27,3 +27,10 @@ export const userSchemaLogin = Yup.object().shape({
     // .max(20, 'Too Long!')
     .required("Required"),
 });
+
+export const tripSchema = Yup.object().shape({
+  carNumber: Yup.string().required("Required"),
+  departure: Yup.string().required("Required"),
+  destination: Yup.string().required("Required"),
+  passengersCount: Yup.string().required("Required"),
+});
